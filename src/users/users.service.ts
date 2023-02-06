@@ -51,7 +51,7 @@ export class UsersService {
 
     async userExistsByEmail(email: string): Promise<boolean> {
         const existingUser = await this.findUserByEmail(email);
-        return !!existingUser;
+        return existingUser.length > 0;
     }
 
     findAll(): Promise<User[]> {
