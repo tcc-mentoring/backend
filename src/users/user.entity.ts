@@ -1,4 +1,4 @@
-import { IsEmail, Length, MinLength } from 'class-validator';
+import { IsEmail, MinLength } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -13,11 +13,11 @@ export class User {
   lastName: string;
 
   @Column({unique: true})
-  @IsEmail()
+  @IsEmail({}, { message: 'mailFormat'})
   email: string;
 
   @Column({select: false})
-  @MinLength(8)
+  @MinLength(8, {message: 'passwordRequirements'})
   password: string;
 }
 
@@ -26,9 +26,9 @@ export class CreateUserDTO {
 
   lastName: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'mailFormat'})
   email: string;
 
-  @MinLength(8)
+  @MinLength(8, {message: 'passwordRequirements'})
   password: string
 }
