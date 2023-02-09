@@ -1,4 +1,4 @@
-import { IsEmail, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -34,4 +34,16 @@ export class CreateUserDTO {
 
   @MinLength(8, {message: 'passwordRequirements'})
   password: string
+}
+
+export class LoginDTO {
+  @IsString()
+  email: string;
+
+  @IsString()
+  password: string;
+}
+
+export class AuthDetails {
+  userAuthUUID: string;
 }
