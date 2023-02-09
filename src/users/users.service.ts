@@ -43,6 +43,27 @@ export class UsersService {
 
         return {userAuthUUID};
     }
+
+    async login(login: LoginDTO): Promise<AuthDetails> {
+        const user = await this.findUserByEmail(login.email);
+
+        const doesPasswordsMatch = await passwordsMatch(login.password, user.password)
+        
+        if (!user || !doesPasswordsMatch) {
+            throw new HttpException({
+                statusCode: HttpStatus.BAD_REQUEST,
+                error: 'Validation error',
+                message: ['invalidCredentials']
+              }, HttpStatus.BAD_REQUEST);
+        }
+        
+        const newAuthUUID = uuidv4();
+
+        await this.usersRepository.update(user.id, { userAuthUUID:  newAuthUUID});
+
+        return {
+            userAuthUUID: newAuthUUID,
+        }
     }
 
     findUserByEmail(email: string): Promise<User> {
