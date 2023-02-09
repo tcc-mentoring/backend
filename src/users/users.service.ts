@@ -2,9 +2,10 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { validateOrReject } from "class-validator";
 import { createUserEntityFromDTO } from "src/facade/UserFacade";
-import { encryptPassword } from "src/utils/password";
+import { encryptPassword, passwordsMatch } from "src/utils/password";
 import { Repository } from "typeorm";
-import { CreateUserDTO, User } from "./user.entity";
+import { AuthDetails, CreateUserDTO, LoginDTO, User } from "./user.entity";
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,7 @@ export class UsersService {
         private usersRepository: Repository<User>,
     ) {}
 
-    async create(user: CreateUserDTO): Promise<void>{
+    async create(user: CreateUserDTO): Promise<AuthDetails>{
         await validateOrReject(user)
             .catch ((errors) => {
                 throw new HttpException({
@@ -38,20 +39,24 @@ export class UsersService {
         const encryptedPassword = await encryptPassword(user.password);
         const newUser = createUserEntityFromDTO(user, encryptedPassword);
         
-        await this.usersRepository.save(newUser);
+        const {userAuthUUID} = await this.usersRepository.save(newUser);
+
+        return {userAuthUUID};
+    }
     }
 
-    findUserByEmail(email: string): Promise<User[]> {
-        return this.usersRepository.find({
+    findUserByEmail(email: string): Promise<User> {
+        return this.usersRepository.findOne({
             where: {
                 email
-            }
+            },
+            select: ['email', 'password', 'id']
         });
     }
 
     async userExistsByEmail(email: string): Promise<boolean> {
         const existingUser = await this.findUserByEmail(email);
-        return existingUser.length > 0;
+        return !!existingUser;
     }
 
     findAll(): Promise<User[]> {
