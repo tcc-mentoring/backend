@@ -6,6 +6,7 @@ export function createUserEntityFromDTO(userDTO: CreateUserDTO, encryptedPasswor
     newUser.lastName = userDTO.lastName;
     newUser.email = userDTO.email;
     newUser.password = encryptedPassword;
+    newUser.userAuthUUID = crypto.randomUUID();
 
     return newUser;
 }

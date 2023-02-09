@@ -19,6 +19,9 @@ export class User {
   @Column({select: false})
   @MinLength(8, {message: 'passwordRequirements'})
   password: string;
+
+  @Column({ nullable: false })
+  userAuthUUID: string;
 }
 
 export class CreateUserDTO {
