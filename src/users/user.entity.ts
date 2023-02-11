@@ -20,7 +20,7 @@ export class User {
   @MinLength(8, {message: 'passwordRequirements'})
   password: string;
 
-  @Column({ nullable: false })
+  @Column({ unique: true, nullable: false })
   userAuthUUID: string;
 }
 
