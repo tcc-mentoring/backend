@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { validateOrReject } from "class-validator";
-import { createUserEntityFromDTO } from "src/facade/UserFacade";
+import { createUserEntityFromDTO, userDTOfromEntity } from "src/facade/UserFacade";
 import { encryptPassword, passwordsMatch } from "src/utils/password";
 import { Repository } from "typeorm";
-import { AuthDetails, CreateUserDTO, LoginDTO, User } from "./user.entity";
+import { AuthDetails, CreateUserDTO, LoginDTO, User, UserDTO } from "./user.entity";
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -47,23 +47,25 @@ export class UsersService {
     async login(login: LoginDTO): Promise<AuthDetails> {
         const user = await this.findUserByEmail(login.email);
 
-        const doesPasswordsMatch = await passwordsMatch(login.password, user.password)
-        
-        if (!user || !doesPasswordsMatch) {
-            throw new HttpException({
-                statusCode: HttpStatus.BAD_REQUEST,
-                error: 'Validation error',
-                message: ['invalidCredentials']
-              }, HttpStatus.BAD_REQUEST);
-        }
-        
-        const newAuthUUID = uuidv4();
+        if (user) {
+            const doesPasswordsMatch = await passwordsMatch(login.password, user.password)
 
-        await this.usersRepository.update(user.id, { userAuthUUID:  newAuthUUID});
+            if (doesPasswordsMatch) {
+                const newAuthUUID = uuidv4();
 
-        return {
-            userAuthUUID: newAuthUUID,
+                await this.usersRepository.update(user.id, { userAuthUUID:  newAuthUUID});
+        
+                return {
+                    userAuthUUID: newAuthUUID,
+                }
+            }
         }
+
+        throw new HttpException({
+            statusCode: HttpStatus.BAD_REQUEST,
+            error: 'Validation error',
+            message: ['invalidCredentials']
+            }, HttpStatus.BAD_REQUEST);
     }
 
     findUserByEmail(email: string): Promise<User> {
@@ -84,4 +86,22 @@ export class UsersService {
         return this.usersRepository.find();
     }
 
+    async findUserByUUID(userAuthUUID: string): Promise<UserDTO> {
+        const user = await this.usersRepository.findOne({
+            where: {
+                userAuthUUID
+            }
+        });
+        
+        if (user) {
+            return userDTOfromEntity(user);
+        }
+
+        throw new HttpException({
+            statusCode: HttpStatus.BAD_REQUEST,
+            error: 'Validation error',
+            message: ['invalidCredentials']
+            }, HttpStatus.BAD_REQUEST);
+    }
+ 
 }
