@@ -11,3 +11,11 @@ export function createUserEntityFromDTO(userDTO: CreateUserDTO, encryptedPasswor
 
     return newUser;
 }
+
+export function userDTOfromEntity(userEntity: User) {
+    let userDTO = new CreateUserDTO();
+    userDTO.firstName = userEntity.firstName;
+    userDTO.lastName = userEntity.lastName;
+    userDTO.email = userEntity.email;
+    return userDTO;
+}
