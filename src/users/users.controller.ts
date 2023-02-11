@@ -23,6 +23,11 @@ export class UsersController {
         return user;
     }
 
+    @Get('/logout/:userAuthUUID')
+    async logout(@Param() params): Promise<void> {
+        await this.usersService.logout(params.userAuthUUID);
+    }
+ 
     @Get()
     findAll(): Promise<User[]> {
         return this.usersService.findAll();
