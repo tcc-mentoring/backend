@@ -47,3 +47,9 @@ export class LoginDTO {
 export class AuthDetails {
   userAuthUUID: string;
 }
+
+export class UserDTO {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
