@@ -45,7 +45,7 @@ export class LoginDTO {
 }
 
 export class AuthDetails {
-  userAuthUUID: string;
+  access_token: string;
 }
 
 export class UserDTO {
