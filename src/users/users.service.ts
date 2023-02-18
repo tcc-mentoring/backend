@@ -45,17 +45,17 @@ export class UsersService {
     }
 
 
-    findUserByEmail(email: string): Promise<User> {
+    findUserCredentialsByEmail(email: string): Promise<User> {
         return this.usersRepository.findOne({
             where: {
                 email
             },
-            select: ['email', 'password', 'id', 'firstName', 'lastName']
+            select: ['email', 'password']
         });
     }
 
     async userExistsByEmail(email: string): Promise<boolean> {
-        const existingUser = await this.findUserByEmail(email);
+        const existingUser = await this.findUserCredentialsByEmail(email);
         return !!existingUser;
     }
 
@@ -63,10 +63,10 @@ export class UsersService {
         return this.usersRepository.find();
     }
 
-    async findUserByUUID(userAuthUUID: string): Promise<UserDTO> {
+    async findCompleteUserByEmail(email: string): Promise<UserDTO> {
         const user = await this.usersRepository.findOne({
             where: {
-                userAuthUUID
+                email
             }
         });
         
@@ -76,7 +76,7 @@ export class UsersService {
 
         throw new HttpException({
             statusCode: HttpStatus.BAD_REQUEST,
-            error: 'Authentication error',
+            error: 'Invalid user error',
             message: ['invalidCredentials']
             }, HttpStatus.BAD_REQUEST);
     }

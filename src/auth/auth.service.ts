@@ -13,7 +13,7 @@ export class AuthService {
     ) {}
 
   async validateUser(email: string, password: string): Promise<UserDTO> {
-    const user = await this.usersService.findUserByEmail(email);
+    const user = await this.usersService.findUserCredentialsByEmail(email);
 
     const doesPasswordsMatch = await passwordsMatch(password, user.password);
     

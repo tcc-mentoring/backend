@@ -1,12 +1,14 @@
 import { Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
 import { AuthDetails, UserDTO } from "src/users/user.entity";
+import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 
 @Controller("auth")
 export class AuthController {
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService,
+        private userService: UsersService) { }
 
     @UseGuards(LocalAuthGuard)
     @Post('/login')
@@ -17,7 +19,8 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async auth(@Request() req): Promise<UserDTO> {
-        console.log('guard?')
-        return req.user;
+        const user = await this.userService.findCompleteUserByEmail(req.user)
+
+        return user;
     }
 }
