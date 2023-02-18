@@ -80,25 +80,4 @@ export class UsersService {
             message: ['invalidCredentials']
             }, HttpStatus.BAD_REQUEST);
     }
- 
-
-    async logout(userAuthUUID: string): Promise<void> {
-        const user = await this.usersRepository.findOne({
-            where: {
-                userAuthUUID
-            }
-        });
-
-        if (user) {
-            const newAuthUUID = uuidv4();
-
-            await this.usersRepository.update(user.id, { userAuthUUID:  newAuthUUID});
-        }
-        
-        throw new HttpException({
-            statusCode: HttpStatus.BAD_REQUEST,
-            error: 'Not found',
-            message: ['resourceNotFound']
-            }, HttpStatus.BAD_REQUEST);
-    }
 }
