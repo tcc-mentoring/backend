@@ -15,7 +15,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<UserDTO> {
     const user = await this.usersService.findUserCredentialsByEmail(email);
 
-    const doesPasswordsMatch = await passwordsMatch(password, user.password);
+    const doesPasswordsMatch = await passwordsMatch(password, user?.password);
     
     if (user && doesPasswordsMatch) {
         return userDTOfromEntity(user);

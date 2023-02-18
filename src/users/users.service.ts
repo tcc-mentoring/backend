@@ -13,7 +13,7 @@ export class UsersService {
         private usersRepository: Repository<User>,
     ) {}
 
-    async create(user: CreateUserDTO): Promise<AuthDetails>{
+    async create(user: CreateUserDTO): Promise<void>{
         await validateOrReject(user)
             .catch ((errors) => {
                 throw new HttpException({
