@@ -20,8 +20,6 @@ export class User {
   @MinLength(8, {message: 'passwordRequirements'})
   password: string;
 
-  @Column({ unique: true, nullable: false })
-  userAuthUUID: string;
 }
 
 export class CreateUserDTO {

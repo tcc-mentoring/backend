@@ -2,10 +2,9 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { validateOrReject } from "class-validator";
 import { createUserEntityFromDTO, userDTOfromEntity } from "src/facade/UserFacade";
-import { encryptPassword, passwordsMatch } from "src/utils/password";
+import { encryptPassword } from "src/utils/password";
 import { Repository } from "typeorm";
-import { AuthDetails, CreateUserDTO, LoginDTO, User, UserDTO } from "./user.entity";
-import { v4 as uuidv4 } from 'uuid';
+import { AuthDetails, CreateUserDTO, User, UserDTO } from "./user.entity";
 
 @Injectable()
 export class UsersService {
@@ -39,9 +38,15 @@ export class UsersService {
         const encryptedPassword = await encryptPassword(user.password);
         const newUser = createUserEntityFromDTO(user, encryptedPassword);
         
-        const {userAuthUUID} = await this.usersRepository.save(newUser);
-
-        return {access_token: userAuthUUID};
+        try {
+            await this.usersRepository.save(newUser);
+        } catch (err) {
+            throw new HttpException({
+                statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: 'Invalid user error',
+                message: ['serverError']
+                }, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
