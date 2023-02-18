@@ -2,15 +2,17 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { validateOrReject } from "class-validator";
 import { createUserEntityFromDTO, userDTOfromEntity } from "src/facade/UserFacade";
+import { ProfileService } from "src/profile/profile.service";
 import { encryptPassword } from "src/utils/password";
 import { Repository } from "typeorm";
-import { AuthDetails, CreateUserDTO, User, UserDTO } from "./user.entity";
+import { CreateUserDTO, User, UserDTO } from "./user.entity";
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private profileService: ProfileService
     ) {}
 
     async create(user: CreateUserDTO): Promise<void>{
@@ -40,6 +42,7 @@ export class UsersService {
         
         try {
             await this.usersRepository.save(newUser);
+            await this.profileService.linkProfileToNewUser(newUser);
         } catch (err) {
             throw new HttpException({
                 statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
