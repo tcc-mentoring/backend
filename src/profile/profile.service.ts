@@ -43,6 +43,6 @@ export class ProfileService {
 
         profile.user = user;
 
-        const savedProfile = await this.profileRepository.save(profile);
+        await this.profileRepository.save(profile);
     }
 }
