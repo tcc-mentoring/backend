@@ -23,6 +23,9 @@ export class Ocupation {
     id: number;
 
     @Column()
+    company: string;
+
+    @Column()
     description: string;
 
     @Column()
@@ -57,14 +60,24 @@ export class AcademyEntry {
 }
 
 export class OcupationDTO {
+    id: number;
+    company: string;
     description: string;
     startDate: string;
     endDate?: string;
 }
 
 export class AcademyEntryDTO {
+    id: number;
     course: string;
     institution: string;
+    startDate: string;
+    endDate?: string;
+}
+
+export class CreateOcupationDTO {
+    description: string;
+    company: string;
     startDate: string;
     endDate?: string;
 }
