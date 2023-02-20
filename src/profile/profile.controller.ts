@@ -1,7 +1,6 @@
-import { Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
-import { ProfileDTO } from "./profile.entity";
+import { CreateOcupationDTO, ProfileDTO } from "./profile.entity";
 import { ProfileService } from "./profile.service";
 
 @Controller('profile')
@@ -10,8 +9,16 @@ export class ProfileController {
 
     @UseGuards(JwtAuthGuard)
     @Get('/user/')
-    async userProfile(@Param() params, @Request() req): Promise<ProfileDTO> {
+    async userProfile(@Request() req): Promise<ProfileDTO> {
         const userProfile = await this.profileService.getUserInformations(req.user);
         return userProfile;
     }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Post('/ocupation/')
+    async addOcupation(@Body() ocupationDTO: CreateOcupationDTO, @Request() req): Promise<void> {
+        console.log({ocupationDTO})
+        await this.profileService.createOcupationToUser(ocupationDTO, req.user)
+    }   
 }
