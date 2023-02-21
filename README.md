@@ -35,6 +35,9 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Environment configuration
+- `JWT_SECRET`: a secret key to generate jwt
+
 ## Stay in touch
 
 - Author - [Felipe Ricardi](https://www.linkedin.com/in/felipericardi/)

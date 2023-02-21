@@ -2,19 +2,20 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { validateOrReject } from "class-validator";
 import { createUserEntityFromDTO, userDTOfromEntity } from "src/facade/UserFacade";
-import { encryptPassword, passwordsMatch } from "src/utils/password";
+import { ProfileService } from "src/profile/profile.service";
+import { encryptPassword } from "src/utils/password";
 import { Repository } from "typeorm";
-import { AuthDetails, CreateUserDTO, LoginDTO, User, UserDTO } from "./user.entity";
-import { v4 as uuidv4 } from 'uuid';
+import { CreateUserDTO, User, UserDTO } from "./user.entity";
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private profileService: ProfileService
     ) {}
 
-    async create(user: CreateUserDTO): Promise<AuthDetails>{
+    async create(user: CreateUserDTO): Promise<void>{
         await validateOrReject(user)
             .catch ((errors) => {
                 throw new HttpException({
@@ -39,46 +40,30 @@ export class UsersService {
         const encryptedPassword = await encryptPassword(user.password);
         const newUser = createUserEntityFromDTO(user, encryptedPassword);
         
-        const {userAuthUUID} = await this.usersRepository.save(newUser);
-
-        return {userAuthUUID};
-    }
-
-    async login(login: LoginDTO): Promise<AuthDetails> {
-        const user = await this.findUserByEmail(login.email);
-
-        if (user) {
-            const doesPasswordsMatch = await passwordsMatch(login.password, user.password)
-
-            if (doesPasswordsMatch) {
-                const newAuthUUID = uuidv4();
-
-                await this.usersRepository.update(user.id, { userAuthUUID:  newAuthUUID});
-        
-                return {
-                    userAuthUUID: newAuthUUID,
-                }
-            }
+        try {
+            await this.usersRepository.save(newUser);
+            await this.profileService.linkProfileToNewUser(newUser);
+        } catch (err) {
+            throw new HttpException({
+                statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: 'Invalid user error',
+                message: ['serverError']
+                }, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        throw new HttpException({
-            statusCode: HttpStatus.BAD_REQUEST,
-            error: 'Validation error',
-            message: ['invalidCredentials']
-            }, HttpStatus.BAD_REQUEST);
     }
 
-    findUserByEmail(email: string): Promise<User> {
+
+    findUserCredentialsByEmail(email: string): Promise<User> {
         return this.usersRepository.findOne({
             where: {
                 email
             },
-            select: ['email', 'password', 'id']
+            select: ['email', 'password']
         });
     }
 
     async userExistsByEmail(email: string): Promise<boolean> {
-        const existingUser = await this.findUserByEmail(email);
+        const existingUser = await this.findUserCredentialsByEmail(email);
         return !!existingUser;
     }
 
@@ -86,10 +71,10 @@ export class UsersService {
         return this.usersRepository.find();
     }
 
-    async findUserByUUID(userAuthUUID: string): Promise<UserDTO> {
+    async findCompleteUserByEmail(email: string): Promise<UserDTO> {
         const user = await this.usersRepository.findOne({
             where: {
-                userAuthUUID
+                email
             }
         });
         
@@ -99,29 +84,8 @@ export class UsersService {
 
         throw new HttpException({
             statusCode: HttpStatus.BAD_REQUEST,
-            error: 'Authentication error',
+            error: 'Invalid user error',
             message: ['invalidCredentials']
-            }, HttpStatus.BAD_REQUEST);
-    }
- 
-
-    async logout(userAuthUUID: string): Promise<void> {
-        const user = await this.usersRepository.findOne({
-            where: {
-                userAuthUUID
-            }
-        });
-
-        if (user) {
-            const newAuthUUID = uuidv4();
-
-            await this.usersRepository.update(user.id, { userAuthUUID:  newAuthUUID});
-        }
-        
-        throw new HttpException({
-            statusCode: HttpStatus.BAD_REQUEST,
-            error: 'Not found',
-            message: ['resourceNotFound']
             }, HttpStatus.BAD_REQUEST);
     }
 }

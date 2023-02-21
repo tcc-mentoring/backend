@@ -39,3 +39,6 @@ mentoring
 
 # vscode settings
 settings.json
+
+# secret
+.env

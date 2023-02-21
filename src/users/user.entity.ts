@@ -1,5 +1,6 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Profile } from 'src/profile/profile.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -15,13 +16,15 @@ export class User {
   @Column({unique: true})
   @IsEmail({}, { message: 'mailFormat'})
   email: string;
-
+  
   @Column({select: false})
   @MinLength(8, {message: 'passwordRequirements'})
   password: string;
 
-  @Column({ unique: true, nullable: false })
-  userAuthUUID: string;
+  @OneToOne(() => Profile, (profile) => profile.user)
+  @JoinColumn()
+  profile: Profile;
+  
 }
 
 export class CreateUserDTO {
@@ -45,7 +48,7 @@ export class LoginDTO {
 }
 
 export class AuthDetails {
-  userAuthUUID: string;
+  access_token: string;
 }
 
 export class UserDTO {

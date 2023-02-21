@@ -7,4 +7,9 @@ describe("Password module test suite", () => {
         
         expect(matchesPassword).toBeTruthy();
     })
+
+    it("should return false if encrypted password is not provided", async () => {
+        const matchesPassword = await passwordsMatch("Test", undefined);
+        expect(matchesPassword).toBeFalsy();
+    })
 })
