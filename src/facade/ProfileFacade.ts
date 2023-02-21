@@ -1,4 +1,4 @@
-import { AcademyEntryDTO, CreateOcupationDTO, Ocupation, OcupationDTO, Profile, ProfileDTO } from "src/profile/profile.entity";
+import { AcademyEntry, AcademyEntryDTO, CreateOcupationDTO, Ocupation, OcupationDTO, Profile, ProfileDTO } from "src/profile/profile.entity";
 
 export function createProfileDTOFromEntity(profileEntity: Profile): ProfileDTO {
     const academyEntries = 
@@ -38,4 +38,15 @@ export function createOcupationEntityFromDTO(ocupationDTO: CreateOcupationDTO): 
     ocupationEntity.endDate = ocupationDTO.endDate; 
 
     return ocupationEntity;
+}
+
+export function createAcademyEntryFromDTO(academyEntryDTO: AcademyEntryDTO): AcademyEntry {
+    const academyEntry = new AcademyEntry();
+
+    academyEntry.course = academyEntryDTO.course;
+    academyEntry.institution = academyEntryDTO.institution;
+    academyEntry.startDate = academyEntryDTO.startDate;
+    academyEntry.endDate = academyEntryDTO.endDate; 
+
+    return academyEntry;
 }

@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { createOcupationEntityFromDTO, createProfileDTOFromEntity } from "src/facade/ProfileFacade";
+import { createAcademyEntryFromDTO, createOcupationEntityFromDTO, createProfileDTOFromEntity } from "src/facade/ProfileFacade";
 import { User } from "src/users/user.entity";
 import { Repository } from "typeorm";
-import { AcademyEntry, CreateOcupationDTO, Ocupation, OcupationDTO, Profile, ProfileDTO } from "./profile.entity";
+import { AcademyEntry, AcademyEntryDTO, CreateOcupationDTO, Ocupation, OcupationDTO, Profile, ProfileDTO } from "./profile.entity";
 
 @Injectable()
 export class ProfileService {
@@ -13,6 +13,8 @@ export class ProfileService {
         private profileRepository: Repository<Profile>,
         @InjectRepository(Ocupation)
         private ocupationRepository: Repository<Ocupation>,
+        @InjectRepository(AcademyEntry)
+        private academyEntryRepository: Repository<AcademyEntry>
     ){}
 
     async getUserInformations(email: string): Promise<ProfileDTO> {
@@ -37,6 +39,20 @@ export class ProfileService {
         }
     }
 
+    async createAcademyEntryToUser(academyEntryDTO: AcademyEntryDTO, email: string): Promise<void> {
+        const userProfile = await this.getUserProfileByEmail(email);
+
+        if (userProfile) {
+            const academyEntry = createAcademyEntryFromDTO(academyEntryDTO);
+
+            await this.academyEntryRepository.save(academyEntry)
+
+            userProfile.academyEntries.push(academyEntry);
+
+            this.profileRepository.save(userProfile);
+        }
+    }
+    
     async getUserProfileByEmail(email: string): Promise<Profile> {
         const userProfile = await this.profileRepository.findOne({
             relations: {

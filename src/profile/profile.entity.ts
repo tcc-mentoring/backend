@@ -82,6 +82,13 @@ export class CreateOcupationDTO {
     endDate?: string;
 }
 
+export class CreateAcademyEntryDTO {
+    course: string;
+    institution: string;
+    startDate: string;
+    endDate?: string;
+}
+
 export class ProfileDTO {
     ocupations: OcupationDTO[];
     academyEntries: AcademyEntryDTO[];
