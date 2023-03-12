@@ -58,7 +58,7 @@ export class UsersService {
             where: {
                 email
             },
-            select: ['email', 'password']
+            select: ['email', 'password', 'id']
         });
     }
 
