@@ -9,6 +9,8 @@ import { ConfigModule } from '@nestjs/config';
 import { resolve } from 'path';
 import { MentorProfileModule } from './mentor-profile/mentor-profile.module';
 import { MentorProfile } from './mentor-profile/mentor-profile.entity';
+import { ScheduleModule } from './schedule/schedule.module';
+import { Schedule } from './schedule/schedule.entity';
 
 const envFilePath: string = resolve(`../.env`);
 
@@ -27,13 +29,15 @@ const envFilePath: string = resolve(`../.env`);
         Profile,
         Ocupation,
         AcademyEntry,
-        MentorProfile
+        MentorProfile,
+        Schedule
       ]
     }),
     UsersModule,
     ProfileModule,
     AuthModule,
     MentorProfileModule,
+    ScheduleModule
   ],
 })
 export class AppModule {}
