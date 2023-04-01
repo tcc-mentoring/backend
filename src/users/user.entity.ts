@@ -1,7 +1,8 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
 import { MentorProfile } from 'src/mentor-profile/mentor-profile.entity';
 import { Profile } from 'src/profile/profile.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Schedule } from 'src/schedule/schedule.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class User {
@@ -29,6 +30,12 @@ export class User {
   @OneToOne(() => MentorProfile, (mentorProfile) => mentorProfile.user)
   @JoinColumn()
   mentorProfile: MentorProfile;
+
+  @OneToMany(() => Schedule, (schedule) => schedule.mentee)
+  menteeSessions: Schedule;
+  
+  @OneToMany(() => Schedule, (schedule) => schedule.menthor)
+  mentorSessions: Schedule;
 }
 
 export class CreateUserDTO {

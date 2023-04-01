@@ -71,7 +71,7 @@ export class UsersService {
         return this.usersRepository.find();
     }
 
-    async findCompleteUserByEmail(email: string): Promise<UserDTO> {
+    async findCompleteUserByEmail(email: string): Promise<User> {
         const user = await this.usersRepository.findOne({
             where: {
                 email
@@ -79,7 +79,7 @@ export class UsersService {
         });
         
         if (user) {
-            return userDTOfromEntity(user);
+            return user;
         }
 
         throw new HttpException({
