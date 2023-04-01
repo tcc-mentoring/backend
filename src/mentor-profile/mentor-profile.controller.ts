@@ -28,9 +28,9 @@ export class MentorProfileController {
         await this.mentorProfileService.createMentorProfileToUser(req.user, mentorProfile);
     }
 
-
+    @UseGuards(JwtAuthGuard)
     @Get()
-    async getMentorProfiles(): Promise<MentorProfileDTO[]> {
-       return await this.mentorProfileService.getMentorProfiles();
+    async getMentorProfiles(@Req() req): Promise<MentorProfileDTO[]> {
+       return await this.mentorProfileService.getMentorProfiles(req.user);
     }
 }
