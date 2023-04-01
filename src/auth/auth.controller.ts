@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
+import { userDTOfromEntity } from "src/facade/UserFacade";
 import { AuthDetails, UserDTO } from "src/users/user.entity";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
@@ -19,8 +20,8 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async auth(@Request() req): Promise<UserDTO> {
-        const user = await this.userService.findCompleteUserByEmail(req.user)
+        const userEntity = await this.userService.findCompleteUserByEmail(req.user)
 
-        return user;
+        return userDTOfromEntity(userEntity);
     }
 }
