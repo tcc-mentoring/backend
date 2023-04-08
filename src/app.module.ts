@@ -11,7 +11,6 @@ import { MentorProfileModule } from './mentor-profile/mentor-profile.module';
 import { MentorProfile } from './mentor-profile/mentor-profile.entity';
 import { ScheduleModule } from './schedule/schedule.module';
 import { Schedule } from './schedule/schedule.entity';
-
 const envFilePath: string = resolve(`../.env`);
 
 @Module({
@@ -30,14 +29,14 @@ const envFilePath: string = resolve(`../.env`);
         Ocupation,
         AcademyEntry,
         MentorProfile,
-        Schedule
+        Schedule,
       ]
     }),
     UsersModule,
     ProfileModule,
     AuthModule,
     MentorProfileModule,
-    ScheduleModule
+    ScheduleModule,
   ],
 })
 export class AppModule {}
