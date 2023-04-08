@@ -1,5 +1,5 @@
 import { User, UserDTO } from "src/users/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Schedule {
@@ -11,7 +11,13 @@ export class Schedule {
 
     @Column()
     endDateTime: string;
-    
+
+    @Column({nullable: true})
+    score: number;
+
+    @Column({nullable: true})
+    details: string;
+
     @ManyToOne(() => User, (user) => user.mentorProfile)
     @JoinColumn()
     menthor: User;
@@ -27,11 +33,27 @@ export class CreateScheduleDTO {
 }
 
 export class SessionDTO {
+    id?: number;
+
     startDateTime: string;
 
     endDateTime: string;
 
     with: UserDTO;
 
-    as: string
+    as: string;
+
+    score: number;
+    
+    details: string;
+}
+
+export class CreateSessionReviewDTO {
+    score: number;
+    details: string;
+}
+
+export class PastSessionsDTO {
+    sessionsToReview: SessionDTO[];
+    finishedSessions: SessionDTO[]
 }

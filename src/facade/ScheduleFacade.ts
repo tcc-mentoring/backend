@@ -21,6 +21,12 @@ export function menteeSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDT
     sessionDTO.startDateTime = scheduleEntity.startDateTime;
     sessionDTO.endDateTime = scheduleEntity.endDateTime;
     sessionDTO.with = userDTOfromEntity(scheduleEntity.menthor);
+    
+    sessionDTO.details = scheduleEntity.details;
+    sessionDTO.score = scheduleEntity.score;
+    
+    sessionDTO.id = scheduleEntity.id;
+
     sessionDTO.as = "mentee"; 
 
     return sessionDTO;
