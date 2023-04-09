@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { menteeSessionsDTOFromEntity, scheduleSessionEntityFromDTO } from 'src/facade/ScheduleFacade';
+import { menteeSessionsDTOFromEntity, mentorSessionsDTOFromEntity, scheduleSessionEntityFromDTO } from 'src/facade/ScheduleFacade';
 import { UsersService } from 'src/users/users.service';
 import { IsNull, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
-import { CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, Schedule, SessionDTO } from './schedule.entity';
+import { CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, Schedule, SessionDTO, UserSessions } from './schedule.entity';
 
 @Injectable()
 export class ScheduleService {
@@ -61,6 +61,16 @@ export class ScheduleService {
     const sessions = await this.scheduleRepository.find({ where: { mentee: { email: menteeEmail } }, relations: ["menthor"] });
 
     return sessions.map(menteeSessionsDTOFromEntity);
+  }
+
+  async getAllSessions(userEmail: string): Promise<UserSessions> {
+    const menteeSessions = await this.scheduleRepository.find({ where: { mentee: { email: userEmail } }, relations: ["menthor"] });
+    const mentorSessions = await this.scheduleRepository.find({ where: { menthor: { email: userEmail } }, relations: ["mentee"] });
+
+    return { 
+      asMentee: menteeSessions.map(menteeSessionsDTOFromEntity), 
+      asMentor: mentorSessions.map(mentorSessionsDTOFromEntity)
+    };
   }
 
   async getScheduleById(id: number): Promise<Schedule> {
