@@ -17,17 +17,33 @@ export function scheduleSessionEntityFromDTO(createScheduleSessionDTO: CreateSch
 }
 
 export function menteeSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDTO {
+    const sessionDTO = sessionsDTOFromEntityBase(scheduleEntity)
+
+    sessionDTO.with = userDTOfromEntity(scheduleEntity.menthor);
+    sessionDTO.as = "mentee"; 
+
+    return sessionDTO;
+}
+
+export function mentorSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDTO {
+    const sessionDTO = sessionsDTOFromEntityBase(scheduleEntity)
+
+    sessionDTO.with = userDTOfromEntity(scheduleEntity.mentee);
+    sessionDTO.as = "mentor"; 
+
+    return sessionDTO;
+}
+
+export function sessionsDTOFromEntityBase(scheduleEntity: Schedule): SessionDTO {    
     const sessionDTO = new SessionDTO();
+
     sessionDTO.startDateTime = scheduleEntity.startDateTime;
     sessionDTO.endDateTime = scheduleEntity.endDateTime;
-    sessionDTO.with = userDTOfromEntity(scheduleEntity.menthor);
     
     sessionDTO.details = scheduleEntity.details;
     sessionDTO.score = scheduleEntity.score;
     
     sessionDTO.id = scheduleEntity.id;
-
-    sessionDTO.as = "mentee"; 
 
     return sessionDTO;
 }
