@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UseGuards, Req, Get, Param } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, SessionDTO } from './schedule.entity';
+import { CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, SessionDTO, UserSessions } from './schedule.entity';
 import { ScheduleService } from './schedule.service';
 
 @Controller('schedule')
@@ -11,6 +11,12 @@ export class ScheduleController {
   @Post()
   async create(@Req() req, @Body() createScheduleDto: CreateScheduleDTO) {
     await this.scheduleService.schedule(createScheduleDto, req.user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("user-sessions")
+  async userSessions(@Req() req): Promise<UserSessions> {
+    return await this.scheduleService.getAllSessions(req.user);
   }
 
   @UseGuards(JwtAuthGuard)

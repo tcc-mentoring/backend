@@ -48,6 +48,11 @@ export class SessionDTO {
     details: string;
 }
 
+export class UserSessions {
+    asMentee: SessionDTO[];
+    asMentor: SessionDTO[]
+}
+
 export class CreateSessionReviewDTO {
     score: number;
     details: string;
