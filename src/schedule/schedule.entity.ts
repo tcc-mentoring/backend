@@ -12,6 +12,9 @@ export class Schedule {
     @Column()
     endDateTime: string;
 
+    @Column({nullable: true, default: "", type: "text"})
+    mentorNotes: string;
+
     @Column({nullable: true})
     score: number;
 
@@ -32,20 +35,29 @@ export class CreateScheduleDTO {
     menthorEmail: string;
 }
 
-export class SessionDTO {
+export class BaseSessionDTO {
     id?: number;
 
     startDateTime: string;
 
     endDateTime: string;
 
-    with: UserDTO;
-
-    as: string;
+    mentorNotes?: string;
 
     score: number;
     
     details: string;
+}
+
+export class SessionDTO extends BaseSessionDTO {
+    with: UserDTO;
+
+    as: string;
+}
+
+export class CompleteSessionDTO extends BaseSessionDTO {
+    mentor: UserDTO;
+    mentee: UserDTO;
 }
 
 export class UserSessions {
@@ -61,4 +73,8 @@ export class CreateSessionReviewDTO {
 export class PastSessionsDTO {
     sessionsToReview: SessionDTO[];
     finishedSessions: SessionDTO[]
+}
+
+export class UpdateMentorNotesDTO {
+    updatedMentorNotes: string;
 }

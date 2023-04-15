@@ -1,5 +1,5 @@
 import * as moment from "moment";
-import { CreateScheduleDTO, Schedule, SessionDTO } from "src/schedule/schedule.entity";
+import { BaseSessionDTO, CompleteSessionDTO, CreateScheduleDTO, Schedule, SessionDTO } from "src/schedule/schedule.entity";
 import { User } from "src/users/user.entity";
 import { userDTOfromEntity } from "./UserFacade";
 
@@ -17,7 +17,7 @@ export function scheduleSessionEntityFromDTO(createScheduleSessionDTO: CreateSch
 }
 
 export function menteeSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDTO {
-    const sessionDTO = sessionsDTOFromEntityBase(scheduleEntity)
+    const sessionDTO = sessionsDTOFromEntityBase(scheduleEntity) as SessionDTO;
 
     sessionDTO.with = userDTOfromEntity(scheduleEntity.menthor);
     sessionDTO.as = "mentee"; 
@@ -26,7 +26,7 @@ export function menteeSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDT
 }
 
 export function mentorSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDTO {
-    const sessionDTO = sessionsDTOFromEntityBase(scheduleEntity)
+    const sessionDTO = sessionsDTOFromEntityBase(scheduleEntity) as SessionDTO;
 
     sessionDTO.with = userDTOfromEntity(scheduleEntity.mentee);
     sessionDTO.as = "mentor"; 
@@ -34,8 +34,18 @@ export function mentorSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDT
     return sessionDTO;
 }
 
-export function sessionsDTOFromEntityBase(scheduleEntity: Schedule): SessionDTO {    
-    const sessionDTO = new SessionDTO();
+export function completeSessionDTOFromEntity(scheduleEntity: Schedule): CompleteSessionDTO {
+    const sessionDTO = sessionsDTOFromEntityBase(scheduleEntity) as CompleteSessionDTO;
+
+    sessionDTO.mentee = userDTOfromEntity(scheduleEntity.mentee);
+    sessionDTO.mentor = userDTOfromEntity(scheduleEntity.menthor);
+    sessionDTO.mentorNotes = scheduleEntity.mentorNotes ?? "";
+
+    return sessionDTO;
+}
+
+export function sessionsDTOFromEntityBase(scheduleEntity: Schedule): BaseSessionDTO {    
+    const sessionDTO = new BaseSessionDTO();
 
     sessionDTO.startDateTime = scheduleEntity.startDateTime;
     sessionDTO.endDateTime = scheduleEntity.endDateTime;
@@ -44,17 +54,6 @@ export function sessionsDTOFromEntityBase(scheduleEntity: Schedule): SessionDTO 
     sessionDTO.score = scheduleEntity.score;
     
     sessionDTO.id = scheduleEntity.id;
-
-    return sessionDTO;
-}
-
-
-export function menthorSessionsDTOFromEntity(scheduleEntity: Schedule): SessionDTO {
-    const sessionDTO = new SessionDTO();
-    sessionDTO.startDateTime = scheduleEntity.startDateTime;
-    sessionDTO.endDateTime = scheduleEntity.endDateTime;
-    sessionDTO.with = userDTOfromEntity(scheduleEntity.mentee);
-    sessionDTO.as = "menthor"; 
 
     return sessionDTO;
 }

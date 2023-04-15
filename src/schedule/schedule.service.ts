@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { menteeSessionsDTOFromEntity, mentorSessionsDTOFromEntity, scheduleSessionEntityFromDTO } from 'src/facade/ScheduleFacade';
 import { UsersService } from 'src/users/users.service';
 import { IsNull, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
-import { CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, Schedule, SessionDTO, UserSessions } from './schedule.entity';
+import { CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, Schedule, SessionDTO, UpdateMentorNotesDTO, UserSessions } from './schedule.entity';
 
 @Injectable()
 export class ScheduleService {
@@ -74,8 +74,15 @@ export class ScheduleService {
   }
 
   async getScheduleById(id: number): Promise<Schedule> {
-    const schedule = await this.scheduleRepository.findOne({where: {id}});
-
+    const schedule = await this.scheduleRepository.findOne({where: {id}, relations: ["menthor", "mentee"]});
     return schedule;
+  }
+
+  async updateMentorNotes(id: number, { updatedMentorNotes }: UpdateMentorNotesDTO) {
+    try {
+      await this.scheduleRepository.update({id}, {mentorNotes: updatedMentorNotes});
+    } catch (err) {
+      console.log({err})
+    }
   }
 }
