@@ -1,8 +1,9 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
+import { Achievement } from 'src/achievements/achievements.entity';
 import { MentorProfile } from 'src/mentor-profile/mentor-profile.entity';
 import { Profile } from 'src/profile/profile.entity';
 import { Schedule } from 'src/schedule/schedule.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany, ManyToMany } from 'typeorm';
 
 @Entity()
 export class User {
@@ -36,6 +37,12 @@ export class User {
   
   @OneToMany(() => Schedule, (schedule) => schedule.menthor)
   mentorSessions: Schedule;
+  
+  @OneToMany(() => Achievement, (achievement) => achievement.mentee)
+  achievements: Achievement;
+
+  @ManyToMany(() => Achievement, (achievement) => achievement.menthors)
+  achievementsParticipated: Achievement;
 }
 
 export class CreateUserDTO {
