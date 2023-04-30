@@ -11,6 +11,8 @@ import { MentorProfileModule } from './mentor-profile/mentor-profile.module';
 import { MentorProfile } from './mentor-profile/mentor-profile.entity';
 import { ScheduleModule } from './schedule/schedule.module';
 import { Schedule } from './schedule/schedule.entity';
+import { AchievementsModule } from './achievements/achievements.module';
+import { Achievement } from './achievements/achievements.entity';
 const envFilePath: string = resolve(`../.env`);
 
 @Module({
@@ -30,6 +32,7 @@ const envFilePath: string = resolve(`../.env`);
         AcademyEntry,
         MentorProfile,
         Schedule,
+        Achievement
       ]
     }),
     UsersModule,
@@ -37,6 +40,7 @@ const envFilePath: string = resolve(`../.env`);
     AuthModule,
     MentorProfileModule,
     ScheduleModule,
+    AchievementsModule,
   ],
 })
 export class AppModule {}
