@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { menteeSessionsDTOFromEntity, mentorSessionsDTOFromEntity, scheduleSessionEntityFromDTO } from 'src/facade/ScheduleFacade';
 import { UsersService } from 'src/users/users.service';
 import { IsNull, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
-import { CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, Schedule, SessionDTO, UpdateMentorNotesDTO, UserSessions } from './schedule.entity';
+import { CreateScheduleDTO, CreateSessionReviewDTO, SessionsDTO, Schedule, SessionDTO, UpdateMentorNotesDTO, UserSessions } from './schedule.entity';
 
 @Injectable()
 export class ScheduleService {
@@ -26,35 +26,74 @@ export class ScheduleService {
     await this.scheduleRepository.save(schedule);
   }
 
-  async getAllMenteePastSessions(menteeEmail: string): Promise<PastSessionsDTO> {
-    const sessionsToReview = await this.scheduleRepository.find({ where: 
-      {
-        mentee: { 
-          email: menteeEmail 
-        },
-        score: IsNull(), 
-        endDateTime: LessThanOrEqual(moment().format("YYYY-MM-DD  HH:mm")),
-      }, relations: ["menthor"] });
+  async getSessions(userEmail: string): Promise<SessionsDTO> {
 
-    const finishedSessions = await this.scheduleRepository.find({ where: 
+    const currentTime = moment.utc().format("YYYY-MM-DD  HH:mm");
+
+    const sessionsToReview = await this.scheduleRepository.find({
+      where:
       {
-        mentee: { 
-          email: menteeEmail 
-        }, 
+        mentee: {
+          email: userEmail
+        },
+        score: IsNull(),
+        endDateTime: LessThanOrEqual(currentTime),
+      }, relations: ["menthor"]
+    });
+
+    const finishedSessions = await this.scheduleRepository.find({
+      where: [{
+        mentee: {
+          email: userEmail
+        },
         score: MoreThanOrEqual(0),
-        endDateTime: LessThanOrEqual(moment().format("YYYY-MM-DD  HH:mm")),
-      }, relations: ["menthor"] });
+        endDateTime: LessThanOrEqual(currentTime),
+      },
+      {
+        menthor: {
+          email: userEmail
+        },
+        score: MoreThanOrEqual(0),
+        endDateTime: LessThanOrEqual(currentTime),
+      }]
+      , relations: ["menthor", "mentee"]
+    });
+
+    const upcomingSessions = await this.scheduleRepository.find({
+      where: [{
+        mentee: {
+          email: userEmail
+        },
+        endDateTime: MoreThanOrEqual(currentTime),
+      },
+      {
+        menthor: {
+          email: userEmail
+        },
+        endDateTime: MoreThanOrEqual(currentTime),
+      }]
+      , relations: ["menthor", "mentee"]
+    });
 
     return {
       sessionsToReview: sessionsToReview.map(menteeSessionsDTOFromEntity),
-      finishedSessions: finishedSessions.map(menteeSessionsDTOFromEntity)
-    }; 
+      finishedSessions: finishedSessions.map((session) =>
+        session.mentee.email === userEmail 
+          ? menteeSessionsDTOFromEntity(session) 
+          : mentorSessionsDTOFromEntity(session)
+      ),
+      upcomingSessions: upcomingSessions.map((session) =>
+        session.mentee.email === userEmail 
+          ? menteeSessionsDTOFromEntity(session) 
+          : mentorSessionsDTOFromEntity(session)
+      ),
+    };
   }
 
   async reviewSession(scheduleId: number, review: CreateSessionReviewDTO): Promise<void> {
     let schedule = await this.getScheduleById(scheduleId);
 
-    await this.scheduleRepository.update({id: schedule.id}, {...review});
+    await this.scheduleRepository.update({ id: schedule.id }, { ...review });
   }
 
   async getAllMenteeSessions(menteeEmail: string): Promise<SessionDTO[]> {
@@ -67,22 +106,22 @@ export class ScheduleService {
     const menteeSessions = await this.scheduleRepository.find({ where: { mentee: { email: userEmail } }, relations: ["menthor"] });
     const mentorSessions = await this.scheduleRepository.find({ where: { menthor: { email: userEmail } }, relations: ["mentee"] });
 
-    return { 
-      asMentee: menteeSessions.map(menteeSessionsDTOFromEntity), 
+    return {
+      asMentee: menteeSessions.map(menteeSessionsDTOFromEntity),
       asMentor: mentorSessions.map(mentorSessionsDTOFromEntity)
     };
   }
 
   async getScheduleById(id: number): Promise<Schedule> {
-    const schedule = await this.scheduleRepository.findOne({where: {id}, relations: ["menthor", "mentee"]});
+    const schedule = await this.scheduleRepository.findOne({ where: { id }, relations: ["menthor", "mentee"] });
     return schedule;
   }
 
   async updateMentorNotes(id: number, { updatedMentorNotes }: UpdateMentorNotesDTO) {
     try {
-      await this.scheduleRepository.update({id}, {mentorNotes: updatedMentorNotes});
+      await this.scheduleRepository.update({ id }, { mentorNotes: updatedMentorNotes });
     } catch (err) {
-      console.log({err})
+      console.log({ err })
     }
   }
 }
