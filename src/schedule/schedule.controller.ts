@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UseGuards, Req, Get, Param } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { CompleteSessionDTO, CreateScheduleDTO, CreateSessionReviewDTO, PastSessionsDTO, SessionDTO, UpdateMentorNotesDTO, UserSessions } from './schedule.entity';
+import { CompleteSessionDTO, CreateScheduleDTO, CreateSessionReviewDTO, SessionsDTO, SessionDTO, UpdateMentorNotesDTO, UserSessions } from './schedule.entity';
 import { ScheduleService } from './schedule.service';
 import { completeSessionDTOFromEntity } from 'src/facade/ScheduleFacade';
 
@@ -27,9 +27,9 @@ export class ScheduleController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("mentee-past-sessions")
-  async menteePastSessions(@Req() req): Promise<PastSessionsDTO> {
-    return await this.scheduleService.getAllMenteePastSessions(req.user);
+  @Get("sessions")
+  async menteePastSessions(@Req() req): Promise<SessionsDTO> {
+    return await this.scheduleService.getSessions(req.user);
   }
 
   @UseGuards(JwtAuthGuard)

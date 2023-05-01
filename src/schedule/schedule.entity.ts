@@ -70,9 +70,10 @@ export class CreateSessionReviewDTO {
     details: string;
 }
 
-export class PastSessionsDTO {
+export class SessionsDTO {
     sessionsToReview: SessionDTO[];
-    finishedSessions: SessionDTO[]
+    finishedSessions: SessionDTO[];
+    upcomingSessions: SessionDTO[];
 }
 
 export class UpdateMentorNotesDTO {
