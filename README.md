@@ -37,6 +37,12 @@ $ npm run test:cov
 
 ## Environment configuration
 - `JWT_SECRET`: a secret key to generate jwt
+- `ENVIRONMENT`: 'prod' on deployment
+- `DB_HOST`
+- `DB_PORT`
+- `DB_DATABASE_NAME`
+- `DB_USER`
+- `DB_PW`
 
 ## Stay in touch
 
