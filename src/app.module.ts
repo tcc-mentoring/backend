@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AcademyEntry, Ocupation, Profile } from './profile/profile.entity';
 import { ProfileModule } from './profile/profile.module';
 import { User } from './users/user.entity';
@@ -15,6 +15,22 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { Achievement } from './achievements/achievements.entity';
 const envFilePath: string = resolve(`../.env`);
 
+let localDatabase: Partial<TypeOrmModuleOptions> = {
+  type: 'sqlite',
+  database: 'mentoring',
+}
+
+if (process.env.ENVIRONMENT === 'prod'){
+  localDatabase = {
+    type: "postgres",
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT),
+    username: process.env.DB_USER,
+    password: process.env.DB_PW,
+    database: process.env.DB_DATABASE_NAME,
+  }
+}
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,8 +38,7 @@ const envFilePath: string = resolve(`../.env`);
       isGlobal: true
     }),
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'mentoring',
+      ...localDatabase,
       synchronize: true,
       entities: [
         User,
@@ -44,3 +59,4 @@ const envFilePath: string = resolve(`../.env`);
   ],
 })
 export class AppModule {}
+ 
